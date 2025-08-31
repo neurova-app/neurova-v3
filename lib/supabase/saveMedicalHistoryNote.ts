@@ -17,7 +17,13 @@ export async function saveMedicalHistoryNote({
 }) {
   const supabase = createClient();
 
-  const insertData: any = {
+  const insertData: {
+    patient_id: string;
+    title: string;
+    date: string;
+    content: OutputData;
+    description?: string;
+  } = {
     patient_id,
     title,
     date,

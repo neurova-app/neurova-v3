@@ -25,12 +25,23 @@ type Props = {
   occupation?: string;
 };
 
+type PatientUpdateData = {
+  country_code?: string;
+  phone_number?: string;
+  email?: string;
+  gender?: string;
+  date_of_birth?: string;
+  language?: string;
+  occupation?: string;
+  [key: string]: unknown;
+};
+
 export const PatientInfoCard = (props: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const updatePatientMutation = useMutation({
-    mutationFn: (updated: any) => updatePatient(props.id, updated),
+    mutationFn: (updated: PatientUpdateData) => updatePatient(props.id, updated),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patient", props.id] });
       toast.success("Patient updated successfully");
@@ -40,8 +51,7 @@ export const PatientInfoCard = (props: Props) => {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSave = (updated: any) => {
+  const handleSave = (updated: PatientUpdateData) => {
     updatePatientMutation.mutate(updated);
   };
 
