@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { TanstackProvider } from "@/providers/TanstackProvider";
+import { SessionTimeoutProvider } from "@/providers/SessionTimeoutProvider";
 import { Toaster } from "@/components/ui/sonner";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -35,10 +36,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TanstackProvider>
-          {children}
-           <Toaster richColors position="top-right" />
-          </TanstackProvider>
+          <SessionTimeoutProvider
+            timeoutMinutes={22}
+            warningMinutes={2}
+          >
+            <TanstackProvider>
+            {children}
+             <Toaster richColors position="top-right" />
+            </TanstackProvider>
+          </SessionTimeoutProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -18,10 +18,34 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client"; // ✅ browser version
 import { ThemeSwitcher } from "./theme-switcher";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    
+    // Get initial session
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+    
+    getUser();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+    
+    return () => subscription.unsubscribe();
+  }, []);
 
   const logout = async () => {
     const supabase = createClient(); // ✅ browser client
@@ -29,12 +53,29 @@ export default function Navbar() {
     router.push("/auth/login");
   };
 
+  // Get user initials for fallback
+  const getUserInitials = (user: User | null) => {
+    if (!user?.user_metadata?.full_name && !user?.email) return "U";
+    
+    const name = user.user_metadata?.full_name || user.email || "";
+    const parts = name.split(" ");
+    
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    
+    return name.substring(0, 2).toUpperCase();
+  };
+
+
   const linkClass = (path: string) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
       pathname === path
         ? "text-sky-600 font-semibold border-b-2 border-sky-600"
         : "text-gray-600 hover:text-sky-600"
     }`;
+
+    console.log(user)
 
   return (
     <div className="sticky top-0 z-50 mb-4 px-4 border-b-2 lg:flex lg:items-center lg:justify-between lg:max-w-[1920px] lg:mx-auto">
@@ -67,12 +108,19 @@ export default function Navbar() {
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage 
+                src={user?.user_metadata?.avatar_url} 
+                alt={user?.user_metadata?.full_name || user?.email || "User avatar"}
+              />
+              <AvatarFallback>
+                {getUserInitials(user)}
+              </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {user?.user_metadata?.full_name || user?.email || "My Account"}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/profile">Profile</Link>
