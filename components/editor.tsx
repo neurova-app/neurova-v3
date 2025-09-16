@@ -55,7 +55,14 @@ export const Editor = ({
   // Sync noteId and date when props change (when selecting a session from list)
   useEffect(() => {
     setNoteId(initialNoteId);
-    if (date) setSelectedDate(new Date(date));
+    if (date) {
+      setSelectedDate(new Date(date));
+    } else if (!initialNoteId) {
+      // Only set current date for new sessions (no noteId)
+      setSelectedDate(new Date());
+    }
+    // Reset changes flag when switching sessions
+    setHasChanges(false);
   }, [initialNoteId, date]);
 
   // Initialize EditorJS

@@ -183,6 +183,7 @@ export default function PatientDetailClient({ id }: { id: string }) {
                 data={selectedSession.content}
                 patientId={patient.id}
                 noteId={selectedSession.id}
+                date={selectedSession.date}
               />
             </motion.div>
           </TabsContent>
