@@ -2,7 +2,7 @@ import Link from "next/link";
 import { TutorialStep } from "./tutorial-step";
 import { ArrowUpRight } from "lucide-react";
 
-export function SignUpUserSteps() {
+export function AuthUserSteps() {
   return (
     <ol className="flex flex-col gap-6">
       {process.env.VERCEL_ENV === "preview" ||
@@ -73,17 +73,18 @@ export function SignUpUserSteps() {
           </Link>
         </TutorialStep>
       ) : null}
-      <TutorialStep title="Sign up your first user">
+      <TutorialStep title="Sign in your first user">
         <p>
           Head over to the{" "}
           <Link
-            href="auth/sign-up"
+            href="auth/login"
             className="font-bold hover:underline text-foreground/80"
           >
-            Sign up
+            Sign in
           </Link>{" "}
-          page and sign up your first user. It&apos;s okay if this is just you
-          for now. Your awesome idea will have plenty of users later!
+          page and sign in with Google. Your account will be created automatically
+          upon first sign-in. It&apos;s okay if this is just you for now. Your awesome
+          idea will have plenty of users later!
         </p>
       </TutorialStep>
     </ol>
