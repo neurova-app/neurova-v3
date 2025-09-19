@@ -46,3 +46,22 @@ export type MedicalHistoryNote = {
   created_at?: string; // ISO timestamp
   updated_at?: string | null; // optional if you track updates
 };
+
+export type TherapistProfile = {
+  id: string;
+  user_id: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  specialization?: string;
+  license_number?: string;
+  years_of_experience?: number;
+  bio?: string;
+  profile_image?: string;
+  office_address?: string;
+  country_code?: Country;
+  emergency_contact?: EmergencyContact;
+  occupation?: string;
+  created_at?: string;
+  updated_at?: string;
+};
