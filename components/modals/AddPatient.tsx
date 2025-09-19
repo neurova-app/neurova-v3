@@ -20,9 +20,19 @@ import { patientSchema } from "@/lib/schemas/patient";
 import { COUNTRIES, Country } from "@/lib/constants/countries";
 import { toast } from "sonner";
 
-export const AddPatient = ({ variant }: { variant?: string }) => {
+interface AddPatientProps {
+  variant?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const AddPatient = ({ variant, open: controlledOpen, onOpenChange }: AddPatientProps) => {
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  // Use controlled open state if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -76,16 +86,19 @@ export const AddPatient = ({ variant }: { variant?: string }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        className={
-          variant
-            ? `border-sky-500 text-sky-600 hover:text-sky-600 w-full border rounded-md flex items-center justify-center gap-2 p-2`
-            : `bg-sky-600 border-sky-600 text-white hover:bg-sky-500 hover:text-white rounded-md w-full max-w-52 flex items-center justify-center gap-2 p-2`
-        }
-      >
-        <Plus className={variant ? `text-sky-600` : `text-white`} size={20} />
-        Add Patient
-      </DialogTrigger>
+      {/* Only show trigger if not controlled externally */}
+      {controlledOpen === undefined && (
+        <DialogTrigger
+          className={
+            variant
+              ? `border-sky-500 text-sky-600 hover:text-sky-600 w-full border rounded-md flex items-center justify-center gap-2 p-2`
+              : `bg-sky-600 border-sky-600 text-white hover:bg-sky-500 hover:text-white rounded-md w-full max-w-52 flex items-center justify-center gap-2 p-2`
+          }
+        >
+          <Plus className={variant ? `text-sky-600` : `text-white`} size={20} />
+          Add Patient
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a new patient</DialogTitle>

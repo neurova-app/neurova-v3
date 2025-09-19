@@ -65,3 +65,21 @@ export type TherapistProfile = {
   created_at?: string;
   updated_at?: string;
 };
+
+export type RecurrenceType = "none" | "daily" | "weekly" | "biweekly" | "monthly" | "yearly";
+
+export type Appointment = {
+  id: string;
+  patient_id: string;
+  therapist_id: string;
+  title: string;
+  date: string; // ISO date string (YYYY-MM-DD)
+  start_time: string; // HH:mm format
+  end_time: string; // HH:mm format
+  notes?: string;
+  is_recurring: boolean;
+  recurrence_type?: RecurrenceType;
+  recurrence_end_date?: string; // ISO date string for when recurrence ends
+  created_at?: string;
+  updated_at?: string;
+};
