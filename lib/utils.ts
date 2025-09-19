@@ -35,6 +35,23 @@ export function formatLocalDateTime(date: Date) {
   return date.toISOString();
 }
 
+export function formatDateOfBirth(dateString?: string): string {
+  if (!dateString) return "--";
+  
+  // Parse date as local date to avoid timezone issues
+  const [year, month, day] = dateString.split('-').map(Number);
+  if (!year || !month || !day) return "Invalid date";
+  
+  const date = new Date(year, month - 1, day); // month is 0-indexed
+  if (isNaN(date.getTime())) return "Invalid date";
+  
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short", 
+    year: "numeric"
+  });
+}
+
 export const medicalHistoryLabels: Record<string, string> = {
   expectations: "Expectations with therapy",
   mainTopic: "Why? - Main reason for consultation",

@@ -1,13 +1,6 @@
-// lib/supabase/addPatient.ts
 import { createClient } from "@/lib/supabase/client";
-import { Country } from "@/lib/constants/countries";
 
-export async function addPatient(data: {
-  name: string;
-  email: string;
-  country_code: Country;
-  phone_number: string;
-}) {
+export async function deletePatient(id: string) {
   const supabase = createClient();
   
   // Get current therapist ID
@@ -21,16 +14,13 @@ export async function addPatient(data: {
     .single();
   
   if (!therapist) throw new Error("Therapist profile not found");
-  
-  const { error } = await supabase.from("patients").insert([
-    {
-      name: data.name,
-      email: data.email,
-      country_code: data.country_code,
-      phone_number: data.phone_number,
-      therapist_id: therapist.id,
-    },
-  ]);
+
+  // Delete the patient (only if it belongs to the current therapist)
+  const { error } = await supabase
+    .from("patients")
+    .delete()
+    .eq("id", id)
+    .eq("therapist_id", therapist.id);
 
   if (error) throw error;
 }

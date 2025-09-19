@@ -9,6 +9,7 @@ import { EditEmergencyContactModal } from "../modals/EditEmergencyContactModal";
 import { updatePatient } from "@/lib/supabase/updatePatient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { COUNTRIES } from "@/lib/constants/countries";
 
 export const EmergencyContactCard = ({
   emergency_contact,
@@ -54,14 +55,26 @@ export const EmergencyContactCard = ({
         </CardHeader>
 
         <CardContent className="flex flex-col gap-3 space-y-1 text-sm">
-          {["name", "phone", "relationship"].map((field) => (
-            <div key={field} className="flex justify-between items-center gap-2">
-              <span className="text-gray-400 capitalize">{field}</span>
-              <span className="text-primary text-right">
-                {emergency_contact?.[field as keyof EmergencyContact] ?? "--"}
-              </span>
-            </div>
-          ))}
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-gray-400">Name</span>
+            <span className="text-primary text-right">
+              {emergency_contact?.name ?? "--"}
+            </span>
+          </div>
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-gray-400">Phone</span>
+            <span className="text-primary text-right">
+              {emergency_contact?.country_code?.flag && emergency_contact?.country_code?.phoneCode && emergency_contact?.phone
+                ? `${emergency_contact.country_code.flag} ${emergency_contact.country_code.phoneCode} ${emergency_contact.phone}`
+                : emergency_contact?.phone || "--"}
+            </span>
+          </div>
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-gray-400">Relationship</span>
+            <span className="text-primary text-right">
+              {emergency_contact?.relationship ?? "--"}
+            </span>
+          </div>
         </CardContent>
       </Card>
 
@@ -70,7 +83,8 @@ export const EmergencyContactCard = ({
         onOpenChange={setIsModalOpen}
         contact={{
           name: emergency_contact?.name ?? "",
-          phone: emergency_contact?.phone ?? 0,
+          country_code: emergency_contact?.country_code ?? COUNTRIES[0],
+          phone: emergency_contact?.phone ?? "",
           relationship: emergency_contact?.relationship ?? "",
         }}
         onSave={handleSave}

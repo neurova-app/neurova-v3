@@ -5,16 +5,17 @@ import { Pencil, MessageCircle, CameraIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { getInitials } from "@/lib/utils";
+import { getInitials, formatDateOfBirth } from "@/lib/utils";
 import { EditPatientModal } from "../modals/EditPatientModal";
 import { updatePatient } from "@/lib/supabase/updatePatient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Country } from "@/lib/constants/countries";
 
 type Props = {
   id: string;
   name: string;
-  country_code: string;
+  country_code: Country;
   phone_number: string;
   email: string;
   profile_img?: string;
@@ -26,7 +27,7 @@ type Props = {
 };
 
 type PatientUpdateData = {
-  country_code?: string;
+  country_code?: Country;
   phone_number?: string;
   email?: string;
   gender?: string;
@@ -56,10 +57,15 @@ export const PatientInfoCard = (props: Props) => {
   };
 
   const fields = [
-    { label: "Phone", value: props.phone_number },
+    { 
+      label: "Phone", 
+      value: props.country_code?.flag && props.country_code?.phoneCode && props.phone_number 
+        ? `${props.country_code.flag} ${props.country_code.phoneCode} ${props.phone_number}` 
+        : props.phone_number || "--"
+    },
     { label: "Email", value: props.email },
     { label: "Gender", value: props.gender || "--" },
-    { label: "DOB", value: props.date_of_birth || "--" },
+    { label: "DOB", value: formatDateOfBirth(props.date_of_birth) },
     { label: "Language", value: props.language || "--" },
     { label: "Occupation", value: props.occupation || "--" },
   ];

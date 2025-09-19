@@ -17,9 +17,12 @@ import { Button } from "../ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPatient } from "@/lib/supabase/addPatient";
 import { patientSchema } from "@/lib/schemas/patient";
+import { COUNTRIES, Country } from "@/lib/constants/countries";
+import { toast } from "sonner";
 
 export const AddPatient = ({ variant }: { variant?: string }) => {
-  const [countryCode, setCountryCode] = useState("+1");
+  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
+  const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -33,13 +36,15 @@ export const AddPatient = ({ variant }: { variant?: string }) => {
     mutationFn: (data: {
       name: string;
       email: string;
-      country_code: string;
+      country_code: Country;
       phone_number: string;
-    }) => addPatient(data), // ✅ updated to match new DB insert
+    }) => addPatient(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       setForm({ name: "", email: "", phone_number: "" });
-      setCountryCode("+1");
+      setSelectedCountry(COUNTRIES[0]);
+      setOpen(false);
+      toast.success("Patient created successfully");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -54,7 +59,7 @@ export const AddPatient = ({ variant }: { variant?: string }) => {
     const result = patientSchema.safeParse({
       name: form.name,
       email: form.email,
-      country_code: countryCode,
+      country_code: selectedCountry,
       phone_number: form.phone_number,
     });
 
@@ -70,7 +75,7 @@ export const AddPatient = ({ variant }: { variant?: string }) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         className={
           variant
@@ -124,14 +129,18 @@ export const AddPatient = ({ variant }: { variant?: string }) => {
             <Label htmlFor="phone_number">Phone Number *</Label>
             <div className="flex gap-2">
               <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="border rounded-md px-2 py-1 text-sm"
+                value={selectedCountry.iso}
+                onChange={(e) => {
+                  const country = COUNTRIES.find(c => c.iso === e.target.value);
+                  if (country) setSelectedCountry(country);
+                }}
+                className="border rounded-md px-2 py-1 text-sm min-w-24"
               >
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+57">🇨🇴 +57</option>
-                <option value="+91">🇮🇳 +91</option>
+                {COUNTRIES.map((country) => (
+                  <option key={country.iso} value={country.iso}>
+                    {country.flag} {country.phoneCode}
+                  </option>
+                ))}
               </select>
               <Input
                 id="phone_number"

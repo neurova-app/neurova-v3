@@ -27,9 +27,10 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
 import { formatLocalDateTime } from "@/lib/utils";
+import { COUNTRIES, Country } from "@/lib/constants/countries";
 
 type PatientData = {
-  country_code: string;
+  country_code: Country;
   phone_number: string;
   email: string;
   gender?: string;
@@ -51,7 +52,9 @@ export function EditPatientModal({
   patient,
   onSave,
 }: EditPatientModalProps) {
-  const [countryCode, setCountryCode] = useState("+1");
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    patient.country_code || COUNTRIES[0]
+  );
   const [phoneNumber, setPhoneNumber] = useState("");
   const [formValues, setFormValues] = useState<
     Omit<PatientData, "country_code" | "phone_number">
@@ -69,7 +72,7 @@ export function EditPatientModal({
   // Load country code and phone number from patient data
   useEffect(() => {
     if (patient.country_code) {
-      setCountryCode(patient.country_code);
+      setSelectedCountry(patient.country_code);
     }
     if (patient.phone_number) {
       setPhoneNumber(patient.phone_number);
@@ -83,7 +86,7 @@ export function EditPatientModal({
   const handleSaveClick = () => {
     const updated: PatientData = {
       ...formValues,
-      country_code: countryCode,
+      country_code: selectedCountry,
       phone_number: phoneNumber,
       date_of_birth: dob ? formatLocalDateTime(dob) : undefined,
     };
@@ -107,14 +110,18 @@ export function EditPatientModal({
             <label className="text-sm font-medium">Phone</label>
             <div className="flex gap-2">
               <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="border rounded-md px-2 py-1 text-sm"
+                value={selectedCountry.iso}
+                onChange={(e) => {
+                  const country = COUNTRIES.find(c => c.iso === e.target.value);
+                  if (country) setSelectedCountry(country);
+                }}
+                className="border rounded-md px-2 py-1 text-sm min-w-24"
               >
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+57">🇨🇴 +57</option>
-                <option value="+91">🇮🇳 +91</option>
+                {COUNTRIES.map((country) => (
+                  <option key={country.iso} value={country.iso}>
+                    {country.flag} {country.phoneCode}
+                  </option>
+                ))}
               </select>
               <Input
                 type="tel"

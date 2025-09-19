@@ -1,8 +1,10 @@
 import { OutputData } from "@editorjs/editorjs";
+import { Country } from "./constants/countries";
 
 export type EmergencyContact = {
   name: string;
-  phone: number;
+  country_code: Country;
+  phone: string;
   relationship: string;
 };
 
@@ -21,7 +23,7 @@ export type Patient = {
   date_of_birth?: string; // ISO format (e.g. "1990-05-14")
   gender?: "male" | "female" | "other";
   national_id: number;
-  country_code: string;
+  country_code: Country; // Changed to store full country object as JSONB
   phone_number: string;
   email: string;
   city?: string;

@@ -115,8 +115,19 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="h-14"
-                  onClick={() => {
+                  className="h-14 cursor-pointer"
+                  onClick={(e) => {
+                    // Don't navigate if clicking on interactive elements
+                    const target = e.target as HTMLElement;
+                    if (
+                      target.closest('button') ||
+                      target.closest('[data-radix-dropdown-menu-trigger]') ||
+                      target.closest('[data-radix-dropdown-menu-content]') ||
+                      target.closest('[role="dialog"]') ||
+                      target.closest('[data-radix-dialog-overlay]')
+                    ) {
+                      return;
+                    }
                     const patient = row.original as Patient;
                     router.push(`/patients/${patient.id}`);
                   }}

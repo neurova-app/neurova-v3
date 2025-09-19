@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { EmergencyContact } from "@/lib/types";
+import { COUNTRIES, Country } from "@/lib/constants/countries";
 
 interface EditEmergencyContactModalProps {
   open: boolean;
@@ -26,13 +27,16 @@ export function EditEmergencyContactModal({
   contact,
   onSave,
 }: EditEmergencyContactModalProps) {
-  const [countryCode, setCountryCode] = useState("+1");
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    contact.country_code || COUNTRIES[0]
+  );
   const [formValues, setFormValues] = useState<EmergencyContact>({
     ...contact,
-    phone: contact.phone ?? 0,
+    phone: contact.phone ?? "",
+    country_code: contact.country_code || COUNTRIES[0],
   });
 
-  const handleChange = (key: keyof EmergencyContact, value: string | number) => {
+  const handleChange = (key: keyof EmergencyContact, value: string | Country) => {
     setFormValues((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -42,9 +46,10 @@ export function EditEmergencyContactModal({
   ];
 
   const handleSaveClick = () => {
-    const updated = {
+    const updated: EmergencyContact = {
       ...formValues,
-      phone: parseInt(`${countryCode}${formValues.phone}`.replace(/\D/g, "")),
+      country_code: selectedCountry,
+      phone: formValues.phone,
     };
     onSave(updated);
     onOpenChange(false);
@@ -75,14 +80,21 @@ export function EditEmergencyContactModal({
             <label className="text-sm font-medium">Phone</label>
             <div className="flex gap-2">
               <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="border rounded-md px-2 py-1 text-sm"
+                value={selectedCountry.iso}
+                onChange={(e) => {
+                  const country = COUNTRIES.find(c => c.iso === e.target.value);
+                  if (country) {
+                    setSelectedCountry(country);
+                    handleChange("country_code", country);
+                  }
+                }}
+                className="border rounded-md px-2 py-1 text-sm min-w-24"
               >
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+57">🇨🇴 +57</option>
-                <option value="+91">🇮🇳 +91</option>
+                {COUNTRIES.map((country) => (
+                  <option key={country.iso} value={country.iso}>
+                    {country.flag} {country.phoneCode}
+                  </option>
+                ))}
               </select>
               <Input
                 type="tel"
