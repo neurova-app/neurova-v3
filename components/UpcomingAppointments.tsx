@@ -110,10 +110,10 @@ function ErrorState({ error, onRetry }: { error: Error; onRetry: () => void }) {
         <div className="flex justify-center">
           <AlertTriangle className="h-12 w-12 text-red-500" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Failed to load appointments
         </h3>
-        <p className="text-sm text-gray-600 max-w-md">
+        <p className="text-sm text-muted-foreground max-w-md">
           {error.message ||
             "There was an error loading your appointments. Please try again."}
         </p>
@@ -139,12 +139,12 @@ function EmptyState() {
     <div className="flex flex-col gap-4 items-center justify-center py-12">
       <div className="text-center space-y-3">
         <div className="flex justify-center">
-          <CalendarIcon className="h-12 w-12 text-gray-400" />
+          <CalendarIcon className="h-12 w-12 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           No upcoming appointments
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Schedule your first appointment to get started.
         </p>
       </div>
@@ -207,13 +207,13 @@ function AppointmentsList({
         return (
           <div
             key={appointment.id || index}
-            className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+            className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card"
           >
             <div className="space-y-2">
               {/* Header: Patient name as title with date/time and badges */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
-                  <h5 className="font-semibold text-base text-gray-900">
+                  <h5 className="font-semibold text-base text-foreground">
                     {appointment.title ||
                       appointment.summary ||
                       "Therapy Session"}
@@ -235,7 +235,7 @@ function AppointmentsList({
                 </div>
               </div>
               {startDateTime && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span className="font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                     {formatAppointmentDate(startDateTime)}
@@ -253,13 +253,13 @@ function AppointmentsList({
 
               {/* Description - more compact */}
               {(appointment.description || appointment.notes) && (
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   {appointment.description || appointment.notes}
                 </p>
               )}
 
               {/* Action buttons - more compact */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <div className="flex items-center gap-2">
                   {meetingLink && (
                     <Button
@@ -298,7 +298,7 @@ function AppointmentsList({
       })}
       {appointments.length >= 10 && (
         <div className="text-center pt-2">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Showing next {appointments.length} appointments
           </p>
         </div>
