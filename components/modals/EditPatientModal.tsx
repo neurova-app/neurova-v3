@@ -30,6 +30,7 @@ import { formatLocalDateTime } from "@/lib/utils";
 import { COUNTRIES, Country } from "@/lib/constants/countries";
 
 type PatientData = {
+  name: string;
   country_code: Country;
   phone_number: string;
   email: string;
@@ -59,6 +60,7 @@ export function EditPatientModal({
   const [formValues, setFormValues] = useState<
     Omit<PatientData, "country_code" | "phone_number">
   >({
+    name: patient.name,
     email: patient.email,
     gender: patient.gender ?? "",
     date_of_birth: patient.date_of_birth ?? "",
@@ -77,7 +79,16 @@ export function EditPatientModal({
     if (patient.phone_number) {
       setPhoneNumber(patient.phone_number);
     }
-  }, [patient.country_code, patient.phone_number]);
+    // Update form values when patient data changes
+    setFormValues({
+      name: patient.name,
+      email: patient.email,
+      gender: patient.gender ?? "",
+      date_of_birth: patient.date_of_birth ?? "",
+      language: patient.language ?? "",
+      occupation: patient.occupation ?? "",
+    });
+  }, [patient]);
 
   const handleChange = (key: keyof typeof formValues, value: string) => {
     setFormValues((prev) => ({ ...prev, [key]: value }));
@@ -105,6 +116,16 @@ export function EditPatientModal({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Name */}
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Name</label>
+            <Input
+              value={formValues.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              placeholder="Enter patient name"
+            />
+          </div>
+
           {/* Phone with country code */}
           <div className="grid gap-2">
             <label className="text-sm font-medium">Phone</label>

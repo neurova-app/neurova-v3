@@ -27,6 +27,7 @@ type Props = {
 };
 
 type PatientUpdateData = {
+  name?: string;
   country_code?: Country;
   phone_number?: string;
   email?: string;
@@ -118,6 +119,7 @@ export const PatientInfoCard = (props: Props) => {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         patient={{
+          name: props.name,
           country_code: props.country_code,
           phone_number: props.phone_number,
           email: props.email,

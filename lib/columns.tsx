@@ -31,6 +31,7 @@ function ActionsCell({ patient }: { patient: Patient }) {
 
   const updatePatientMutation = useMutation({
     mutationFn: (updated: {
+      name?: string;
       country_code?: Country;
       phone_number?: string;
       email?: string;
@@ -71,6 +72,7 @@ function ActionsCell({ patient }: { patient: Patient }) {
   };
 
   const handleSaveEdit = (updated: {
+    name?: string;
     country_code?: Country;
     phone_number?: string;
     email?: string;
@@ -122,6 +124,7 @@ function ActionsCell({ patient }: { patient: Patient }) {
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
         patient={{
+          name: patient.name,
           country_code: patient.country_code,
           phone_number: patient.phone_number,
           email: patient.email,
