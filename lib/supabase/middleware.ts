@@ -25,17 +25,17 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
+            request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(name, value, options)
           );
         },
       },
-    },
+    }
   );
 
   // Do not run code between createServerClient and
@@ -49,13 +49,13 @@ export async function updateSession(request: NextRequest) {
 
   // Protected routes that require authentication
   const protectedPaths = ["/dashboard", "/patients"];
-  const isProtectedPath = protectedPaths.some(path => 
+  const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
-  ) || request.nextUrl.pathname === "/";
-  
+  );
+
   // Auth paths that don't require authentication
   const authPaths = ["/auth"];
-  const isAuthPath = authPaths.some(path => 
+  const isAuthPath = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
@@ -67,7 +67,11 @@ export async function updateSession(request: NextRequest) {
   }
 
   // If user is authenticated and trying to access auth pages, redirect to dashboard
-  if (user && isAuthPath && !request.nextUrl.pathname.startsWith("/auth/callback")) {
+  if (
+    user &&
+    isAuthPath &&
+    !request.nextUrl.pathname.startsWith("/auth/callback")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

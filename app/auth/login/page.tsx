@@ -1,6 +1,18 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Background pattern */}

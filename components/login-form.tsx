@@ -54,7 +54,9 @@ export function LoginForm({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/dashboard')}`,
+          redirectTo: `${
+            window.location.origin
+          }/auth/callback?next=${encodeURIComponent("/dashboard")}`,
           scopes: "https://www.googleapis.com/auth/calendar.app.created",
           queryParams: {
             access_type: "offline",
@@ -127,7 +129,6 @@ export function LoginForm({
               </svg>
               <div className="space-y-3">
                 <div>
-              
                   <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
                     NEUROVA requires Google authentication to enable calendar
                     integration for appointment scheduling.{" "}
@@ -231,11 +232,11 @@ export function LoginForm({
                 >
                   <path
                     fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>HIPAA Compliant</span>
+                <span>Secure & Private</span>
               </div>
               <div className="h-3 w-px bg-gray-300 dark:bg-slate-600" />
               <div className="flex items-center space-x-1">
@@ -247,11 +248,11 @@ export function LoginForm({
                 >
                   <path
                     fillRule="evenodd"
-                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Secure & Private</span>
+                <span>GDPR Compliant</span>
               </div>
             </div>
           </div>
