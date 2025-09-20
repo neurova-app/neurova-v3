@@ -16,7 +16,7 @@ import {
   Trash2,
   Repeat,
   Calendar,
-  User,
+
 } from "lucide-react";
 import { Button } from "./ui/button";
 
