@@ -31,10 +31,11 @@ import { CalendarIcon, Clock, Users, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn, addOneHour } from "@/lib/utils";
 import { toast } from "sonner";
-import { Patient, RecurrenceType, Appointment } from "@/lib/types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Patient, RecurrenceType } from "@/lib/types";
+import { useQuery } from "@tanstack/react-query";
 import { getPatients } from "@/lib/supabase/getPatients";
 import { AddPatient } from "./AddPatient";
+import { useAppointments } from "@/hooks/useAppointments";
 
 const RECURRENCE_OPTIONS = [
   { value: "daily", label: "Daily" },
@@ -80,8 +81,6 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
     };
   });
 
-  const queryClient = useQueryClient();
-
   // Query for patients
   const { data: patients = [], isLoading: patientsLoading } = useQuery<
     Patient[]
@@ -90,27 +89,35 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
     queryFn: getPatients,
   });
 
-  // Mutation to save appointment (you'll need to implement this)
-  const saveAppointmentMutation = useMutation({
-    mutationFn: async (
-      appointmentData: Omit<Appointment, "id" | "created_at" | "updated_at">
-    ) => {
-      // TODO: Implement saveAppointment function
-      console.log("Saving appointment:", appointmentData);
-      // await saveAppointment(appointmentData);
-      return appointmentData;
-    },
-    onSuccess: () => {
+  // Use the appointments hook for creating appointments
+  const { createAppointment, isCreating, createError, createSuccess } = useAppointments();
+
+  // Handle success/error states
+  useEffect(() => {
+    if (createSuccess) {
       toast.success("Appointment scheduled successfully!");
       setOpen(false);
-      // Invalidate relevant queries if needed
-      // queryClient.invalidateQueries({ queryKey: ["appointments"] });
-    },
-    onError: (error) => {
-      console.error("Error saving appointment:", error);
+      // Reset form
+      const defaultStartTime = "09:00";
+      setFormData({
+        patient_id: "",
+        title: "",
+        start_time: defaultStartTime,
+        end_time: addOneHour(defaultStartTime),
+        notes: "",
+        is_recurring: false,
+        recurrence_type: "weekly",
+        recurrence_end_date: "",
+      });
+      setSelectedDate(undefined);
+    }
+  }, [createSuccess]);
+
+  useEffect(() => {
+    if (createError) {
       toast.error("Failed to schedule appointment. Please try again.");
-    },
-  });
+    }
+  }, [createError]);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -160,27 +167,36 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
       return;
     }
 
-    const appointmentData: Omit<
-      Appointment,
-      "id" | "created_at" | "updated_at"
-    > = {
-      patient_id: formData.patient_id,
-      therapist_id: "", // TODO: Get from auth context
-      title: formData.title,
-      date: format(selectedDate, "yyyy-MM-dd"),
-      start_time: formData.start_time,
-      end_time: formData.end_time,
-      notes: formData.notes,
-      is_recurring: formData.is_recurring,
-      recurrence_type: formData.is_recurring
-        ? formData.recurrence_type
-        : undefined,
-      recurrence_end_date: formData.is_recurring
-        ? formData.recurrence_end_date
-        : undefined,
+    // Combine date and time to create proper datetime strings with timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    
+    // Create datetime strings in the format Google Calendar expects
+    const startDateTime = `${dateStr}T${formData.start_time}:00`;
+    const endDateTime = `${dateStr}T${formData.end_time}:00`;
+    
+    const appointmentData = {
+      summary: formData.title,
+      description: formData.notes,
+      start: {
+        dateTime: startDateTime,
+        timeZone: timezone,
+      },
+      end: {
+        dateTime: endDateTime,
+        timeZone: timezone,
+      },
+      attendees: selectedPatient?.email ? [{
+        email: selectedPatient.email,
+        displayName: selectedPatient.name,
+      }] : undefined,
+      // Include recurrence information
+      isRecurring: formData.is_recurring,
+      recurrenceType: formData.is_recurring ? formData.recurrence_type : undefined,
+      recurrenceEndDate: formData.is_recurring ? formData.recurrence_end_date : undefined,
     };
 
-    saveAppointmentMutation.mutate(appointmentData);
+    createAppointment(appointmentData);
   };
 
   const selectedPatient = patients.find((p) => p.id === formData.patient_id);
@@ -449,13 +465,9 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
             </Button>
             <Button
               onClick={handleSave}
-              disabled={
-                patients.length === 0 || saveAppointmentMutation.isPending
-              }
+              disabled={patients.length === 0 || isCreating}
             >
-              {saveAppointmentMutation.isPending
-                ? "Scheduling..."
-                : "Schedule Appointment"}
+              {isCreating ? "Scheduling..." : "Schedule Appointment"}
             </Button>
           </DialogFooter>
         </DialogContent>

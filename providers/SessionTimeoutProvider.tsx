@@ -128,7 +128,7 @@ export function SessionTimeoutProvider({
     clearAllTimers();
     setShowWarning(false);
     
-    console.log(`Timer reset. Warning in ${WARNING_MS/1000}s, Timeout in ${TIMEOUT_MS/1000}s`);
+    // console.log(`Timer reset. Warning in ${WARNING_MS/1000}s, Timeout in ${TIMEOUT_MS/1000}s`);
     
     // Set warning timer
     warningRef.current = setTimeout(() => {
@@ -166,13 +166,11 @@ export function SessionTimeoutProvider({
   const handleActivity = (event: Event) => {
     // If warning dialog is showing, ignore ALL activity regardless of where it happens
     if (showWarning) {
-      console.log("Warning dialog is open - ignoring all activity");
       return;
     }
     
     // Only reset timer if authenticated and NOT showing warning dialog
     if (isAuthenticated) {
-      console.log("Activity detected, resetting timer");
       resetTimer();
     }
   };

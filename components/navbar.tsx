@@ -75,8 +75,6 @@ export default function Navbar() {
         : "text-gray-600 hover:text-sky-600"
     }`;
 
-    console.log(user)
-
   return (
     <div className="sticky top-0 z-50 mb-4 px-4 border-b-2 lg:flex lg:items-center lg:justify-between lg:max-w-[1920px] lg:mx-auto">
       <div className="flex gap-8">
