@@ -76,3 +76,5 @@ temp/
 
 # Supabase
 .supabase/
+# Sentry Config File
+.env.sentry-build-plugin
