@@ -54,7 +54,7 @@ export function LoginForm({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/dashboard')}`,
           scopes: "https://www.googleapis.com/auth/calendar.app.created",
           queryParams: {
             access_type: "offline",

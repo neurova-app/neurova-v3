@@ -38,15 +38,12 @@ export async function GET(request: Request) {
 
     if (!error && data?.user) {
       console.log("Successfully authenticated user:", data.user.email);
-      const forwardedHost = request.headers.get("x-forwarded-host");
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
+      
+      // Create redirect response
+      const redirectUrl = `${origin}${next}`;
+      console.log("Redirecting to:", redirectUrl);
+      
+      return NextResponse.redirect(redirectUrl);
     } else if (error) {
       console.error("Failed to exchange code for session:", error.message);
       return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(error.message)}`);
