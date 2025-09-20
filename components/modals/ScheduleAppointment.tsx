@@ -29,7 +29,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
 import { CalendarIcon, Clock, Users, Plus } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, addOneHour } from "@/lib/utils";
 import { toast } from "sonner";
 import { Patient, RecurrenceType, Appointment } from "@/lib/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -48,12 +48,17 @@ const TIME_OPTIONS = Array.from({ length: 24 * 4 }, (_, i) => {
   const totalMinutes = i * 15;
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  const time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  const displayTime = new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const time = `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+  const displayTime = new Date(`2000-01-01T${time}`).toLocaleTimeString(
+    "en-US",
+    {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }
+  );
   return { value: time, label: displayTime };
 });
 
@@ -61,28 +66,35 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
   const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    patient_id: "",
-    title: "",
-    start_time: "09:00",
-    end_time: "10:00",
-    notes: "",
-    is_recurring: false,
-    recurrence_type: "weekly" as RecurrenceType,
-    recurrence_end_date: "",
+  const [formData, setFormData] = useState(() => {
+    const defaultStartTime = "09:00";
+    return {
+      patient_id: "",
+      title: "",
+      start_time: defaultStartTime,
+      end_time: addOneHour(defaultStartTime),
+      notes: "",
+      is_recurring: false,
+      recurrence_type: "weekly" as RecurrenceType,
+      recurrence_end_date: "",
+    };
   });
 
   const queryClient = useQueryClient();
 
   // Query for patients
-  const { data: patients = [], isLoading: patientsLoading } = useQuery<Patient[]>({
+  const { data: patients = [], isLoading: patientsLoading } = useQuery<
+    Patient[]
+  >({
     queryKey: ["patients"],
     queryFn: getPatients,
   });
 
   // Mutation to save appointment (you'll need to implement this)
   const saveAppointmentMutation = useMutation({
-    mutationFn: async (appointmentData: Omit<Appointment, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (
+      appointmentData: Omit<Appointment, "id" | "created_at" | "updated_at">
+    ) => {
       // TODO: Implement saveAppointment function
       console.log("Saving appointment:", appointmentData);
       // await saveAppointment(appointmentData);
@@ -103,11 +115,12 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
   // Reset form when modal opens
   useEffect(() => {
     if (open) {
+      const defaultStartTime = "09:00";
       setFormData({
         patient_id: "",
         title: "",
-        start_time: "09:00",
-        end_time: "10:00",
+        start_time: defaultStartTime,
+        end_time: addOneHour(defaultStartTime),
         notes: "",
         is_recurring: false,
         recurrence_type: "weekly",
@@ -141,13 +154,16 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
     }
 
     // Find the selected patient
-    const selectedPatient = patients.find(p => p.id === formData.patient_id);
+    const selectedPatient = patients.find((p) => p.id === formData.patient_id);
     if (!selectedPatient) {
       toast.error("Selected patient not found");
       return;
     }
 
-    const appointmentData: Omit<Appointment, "id" | "created_at" | "updated_at"> = {
+    const appointmentData: Omit<
+      Appointment,
+      "id" | "created_at" | "updated_at"
+    > = {
       patient_id: formData.patient_id,
       therapist_id: "", // TODO: Get from auth context
       title: formData.title,
@@ -156,14 +172,18 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
       end_time: formData.end_time,
       notes: formData.notes,
       is_recurring: formData.is_recurring,
-      recurrence_type: formData.is_recurring ? formData.recurrence_type : undefined,
-      recurrence_end_date: formData.is_recurring ? formData.recurrence_end_date : undefined,
+      recurrence_type: formData.is_recurring
+        ? formData.recurrence_type
+        : undefined,
+      recurrence_end_date: formData.is_recurring
+        ? formData.recurrence_end_date
+        : undefined,
     };
 
     saveAppointmentMutation.mutate(appointmentData);
   };
 
-  const selectedPatient = patients.find(p => p.id === formData.patient_id);
+  const selectedPatient = patients.find((p) => p.id === formData.patient_id);
 
   return (
     <>
@@ -176,14 +196,12 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
           }
         >
           <CalendarIcon
-            className={
-              variant ? `text-sky-600` : `text-white `
-            }
+            className={variant ? `text-sky-600` : `text-white `}
             size={20}
           />
           Schedule Appointment
         </DialogTrigger>
-        
+
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
@@ -204,7 +222,8 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                     <Users className="h-8 w-8" />
                   </div>
                   <p className="text-sm text-gray-600">
-                    No patients found. Please create a patient first to schedule appointments.
+                    No patients found. Please create a patient first to schedule
+                    appointments.
                   </p>
                   <Button
                     onClick={() => setIsAddPatientOpen(true)}
@@ -218,8 +237,8 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                 <div className="flex space-x-2">
                   <Select
                     value={formData.patient_id}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, patient_id: value }))
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, patient_id: value }))
                     }
                   >
                     <SelectTrigger className="flex-1">
@@ -228,7 +247,9 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                           <span className="flex items-center space-x-2">
                             <span>{selectedPatient.name}</span>
                             <span className="text-gray-400">•</span>
-                            <span className="text-sm text-gray-500">{selectedPatient.email}</span>
+                            <span className="text-sm text-gray-500">
+                              {selectedPatient.email}
+                            </span>
                           </span>
                         )}
                       </SelectValue>
@@ -238,7 +259,9 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                         <SelectItem key={patient.id} value={patient.id}>
                           <div className="flex flex-col">
                             <span>{patient.name}</span>
-                            <span className="text-xs text-gray-500">{patient.email}</span>
+                            <span className="text-xs text-gray-500">
+                              {patient.email}
+                            </span>
                           </div>
                         </SelectItem>
                       ))}
@@ -261,8 +284,8 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                 id="title"
                 placeholder="e.g., Initial Consultation, Follow-up Session"
                 value={formData.title}
-                onChange={(e) => 
-                  setFormData(prev => ({ ...prev, title: e.target.value }))
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, title: e.target.value }))
                 }
               />
             </div>
@@ -288,7 +311,9 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                     mode="single"
                     selected={selectedDate}
                     onSelect={setSelectedDate}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    disabled={(date) =>
+                      date < new Date(new Date().setHours(0, 0, 0, 0))
+                    }
                   />
                 </PopoverContent>
               </Popover>
@@ -300,8 +325,12 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                 <Label>Start Time *</Label>
                 <Select
                   value={formData.start_time}
-                  onValueChange={(value) => 
-                    setFormData(prev => ({ ...prev, start_time: value }))
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      start_time: value,
+                      end_time: addOneHour(value),
+                    }))
                   }
                 >
                   <SelectTrigger>
@@ -321,8 +350,8 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                 <Label>End Time *</Label>
                 <Select
                   value={formData.end_time}
-                  onValueChange={(value) => 
-                    setFormData(prev => ({ ...prev, end_time: value }))
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, end_time: value }))
                   }
                 >
                   <SelectTrigger>
@@ -346,7 +375,7 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                 id="recurring"
                 checked={formData.is_recurring}
                 onCheckedChange={(checked) =>
-                  setFormData(prev => ({ ...prev, is_recurring: checked }))
+                  setFormData((prev) => ({ ...prev, is_recurring: checked }))
                 }
               />
               <Label htmlFor="recurring">Recurring appointment</Label>
@@ -359,8 +388,11 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                   <Label>Repeat every</Label>
                   <Select
                     value={formData.recurrence_type}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, recurrence_type: value as RecurrenceType }))
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        recurrence_type: value as RecurrenceType,
+                      }))
                     }
                   >
                     <SelectTrigger>
@@ -380,10 +412,17 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                   <Input
                     type="date"
                     value={formData.recurrence_end_date}
-                    onChange={(e) => 
-                      setFormData(prev => ({ ...prev, recurrence_end_date: e.target.value }))
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        recurrence_end_date: e.target.value,
+                      }))
                     }
-                    min={selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined}
+                    min={
+                      selectedDate
+                        ? format(selectedDate, "yyyy-MM-dd")
+                        : undefined
+                    }
                   />
                 </div>
               </div>
@@ -396,8 +435,8 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
                 id="notes"
                 placeholder="Add any additional notes for this appointment..."
                 value={formData.notes}
-                onChange={(e) => 
-                  setFormData(prev => ({ ...prev, notes: e.target.value }))
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, notes: e.target.value }))
                 }
                 rows={3}
               />
@@ -408,20 +447,21 @@ export const ScheduleAppointment = ({ variant }: { variant?: string }) => {
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleSave} 
-              disabled={patients.length === 0 || saveAppointmentMutation.isPending}
+            <Button
+              onClick={handleSave}
+              disabled={
+                patients.length === 0 || saveAppointmentMutation.isPending
+              }
             >
-              {saveAppointmentMutation.isPending ? "Scheduling..." : "Schedule Appointment"}
+              {saveAppointmentMutation.isPending
+                ? "Scheduling..."
+                : "Schedule Appointment"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <AddPatient
-        open={isAddPatientOpen}
-        onOpenChange={setIsAddPatientOpen}
-      />
+      <AddPatient open={isAddPatientOpen} onOpenChange={setIsAddPatientOpen} />
     </>
   );
 };
