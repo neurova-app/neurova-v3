@@ -317,8 +317,8 @@ export function LandingPage() {
                     <Heart className="w-8 h-8 text-primary-foreground" />
                   </div>
                   <blockquote className="text-lg text-muted-foreground italic">
-                    "NEUROVA has completely transformed how I manage my
-                    practice. I can focus on my patients instead of paperwork."
+                    &quot;NEUROVA has completely transformed how I manage my
+                    practice. I can focus on my patients instead of paperwork.&quot;
                   </blockquote>
                   <div>
                     <p className="font-semibold text-foreground">
